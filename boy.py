@@ -1,5 +1,6 @@
 from pico2d import load_image, get_time
-from statemachine import StateMachine, space_down, time_out, right_down, left_down, right_up, left_up
+from statemachine import StateMachine, space_down, time_out, right_down, left_down, right_up, left_up, start_event
+from statemachine import a_down, a_up
 
 
 class Idle:
@@ -12,7 +13,7 @@ class Idle:
         if left_up(e) or right_down(e):
             boy.action = 2
             boy.face_dir = -1
-        elif right_up(e)or left_down(e):
+        elif right_up(e) or left_down(e) or start_event(e):
             boy.action = 3
             boy.face_dir = 1
         #위에 얘들은 전부 입력이 있는 후에벌어지는 idle들임
@@ -125,15 +126,16 @@ class Boy:
         
         self.state_machine = StateMachine(self)
         #self.state_machine.start(Sleep)
-#        self.state_machine.start(Idle)
 
         self.state_machine.start(Idle)
+
         self.state_machine.set_transitions(
             {
-#                Sleep: {space_down:Idle},      #sleep상태에서 spacedown상태(함수명을 key값으로 사용가능)가 되면 Idle 상태가 된다
-                Idle: {right_down:Run, left_down:Run, left_up:Run, right_up:Run, time_out:Sleep},
-                Run : {right_down: Idle, left_down: Idle, right_up: Idle, left_up:Idle},
-                Sleep : {right_down:Run, left_down:Run, right_up:Run, left_up:Run}
+#                Idle: {right_down:Run, left_down:Run, left_up:Run, right_up:Run, time_out:Sleep},
+                Idle : {start_event: Idle, a_down:AutoRun},
+                AutoRun : {time_out:Idle}
+#                Run : {right_down: Idle, left_down: Idle, right_up: Idle, left_up:Idle},
+#                Sleep : {right_down:Run, left_down:Run, right_up:Run, left_up:Run}
             }
         )
 
@@ -155,3 +157,30 @@ class Boy:
     def draw(self):
         self.state_machine.draw()
 
+
+
+
+
+class AutoRun:
+    @staticmethod
+    def enter(boy, e):
+        if a_down(e) or boy.face_dir == 1:
+            boy.action = 1
+            boy.dir = 1
+        elif a_down(e) or boy.face_dir == -1:
+            boy.action = 0
+            boy.dir = -1
+
+        boy.frame = 0
+    @staticmethod
+    def exit(boy, e):
+        pass
+    @staticmethod
+    def do(boy):
+        boy.frame = (boy.frame+1) %8
+        boy.x += boy.dir * 10
+        pass
+    @staticmethod
+    def draw(boy):
+        boy.image.clip_draw(boy.frame*100,boy.action*100, 100,100, boy.x,boy.y, 200,200)
+        pass

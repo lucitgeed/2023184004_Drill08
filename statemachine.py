@@ -3,10 +3,12 @@ from dataclasses import asdict
 from multiprocessing.connection import answer_challenge
 from xml.dom.minicompat import defproperty
 
-from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDLK_LEFT, SDL_KEYUP
+from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDLK_LEFT, SDL_KEYUP, SDLK_a
+
 
 def start_event(e):
     return e[0] == 'start'
+# ^ 최초상태
 
 
 def space_down(e):
@@ -90,3 +92,10 @@ def left_down(e):
     return e[0] == 'input' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_LEFT
 def left_up(e):
     return e[0] == 'input' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
+
+
+#AutoRun을 위한 함수
+def a_down(e):
+    return e[0] == 'input' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
+def a_up(e):
+    return e[0] == 'input' and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
