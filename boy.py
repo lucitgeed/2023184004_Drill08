@@ -1,4 +1,4 @@
-from pico2d import load_image, get_time
+from pico2d import load_image, get_time, delay
 from statemachine import StateMachine, space_down, time_out, right_down, left_down, right_up, left_up, start_event
 from statemachine import a_down, a_up
 
@@ -66,7 +66,7 @@ class Sleep:
         boy.frame = (boy.frame + 1) %8
         pass
     @staticmethod
-    def draw(boy, e):
+    def draw(boy):
         if boy.face_dir == 1:   #오른쪽 방향
             boy.image.clip_composite_draw(boy.frame*100,300, 100,100,
             3.141592/2,#회전각도
@@ -75,7 +75,7 @@ class Sleep:
 
         elif boy.face_dir == -1:  # 왼쪽방향보는중
             boy.image.clip_composite_draw(boy.frame*100,200, 100,100,
-            3.141592/2,#회전각도
+            3.141592/2*3,#회전각도
             '',#좌우상하반전은 하지않겠다
             boy.x -25,boy.y -25, 100,100 )
             # ^ 잘라내서 회전해라
@@ -105,6 +105,7 @@ class Run:
     def do(boy):
         boy.frame = (boy.frame+1) %8
         boy.x +=boy.dir * 3
+        delay(0.01)
         pass
     @staticmethod
     def draw(boy):
@@ -131,11 +132,12 @@ class Boy:
 
         self.state_machine.set_transitions(
             {
-#                Idle: {right_down:Run, left_down:Run, left_up:Run, right_up:Run, time_out:Sleep},
-                Idle : {start_event: Idle, a_down:AutoRun},
-                AutoRun : {time_out:Idle}
-#                Run : {right_down: Idle, left_down: Idle, right_up: Idle, left_up:Idle},
-#                Sleep : {right_down:Run, left_down:Run, right_up:Run, left_up:Run}
+                Idle: {right_down:Run, left_down:Run, left_up:Run, right_up:Run, time_out:Sleep,
+                       start_event: Idle, a_down:AutoRun},
+                AutoRun : {time_out:Idle,
+                           right_down:Run, left_down:Run, left_up:Run, right_up:Run},
+                Run : {right_down: Idle, left_down: Idle, right_up: Idle, left_up:Idle},
+                Sleep : {right_down:Run, left_down:Run, right_up:Run, left_up:Run}
             }
         )
 
@@ -164,10 +166,10 @@ class Boy:
 class AutoRun:
     @staticmethod
     def enter(boy, e):
-        if a_down(e) or boy.face_dir == 1:
+        if a_down(e) and boy.face_dir == 1:
             boy.action = 1
             boy.dir = 1
-        elif a_down(e) or boy.face_dir == -1:
+        elif a_down(e) and boy.face_dir == -1:
             boy.action = 0
             boy.dir = -1
 
@@ -178,9 +180,21 @@ class AutoRun:
     @staticmethod
     def do(boy):
         boy.frame = (boy.frame+1) %8
-        boy.x += boy.dir * 10
-        pass
+
+        if 70 <= boy.x <= 770:
+            boy.x += boy.dir * 10
+        elif boy.x < 70:
+            boy.x = 70
+            boy.dir -= boy.dir*2
+        elif boy.x > 770:
+            boy.x = 770
+            boy.dir -= boy.dir * 2
+
+        if boy.dir == 1:
+            boy.action = 1
+        elif boy.dir == -1:
+            boy.action = 0
+
     @staticmethod
     def draw(boy):
-        boy.image.clip_draw(boy.frame*100,boy.action*100, 100,100, boy.x,boy.y, 200,200)
-        pass
+        boy.image.clip_draw(boy.frame*100, boy.action*100, 100, 100, boy.x, boy.y + 20, 200, 200)
