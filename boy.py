@@ -1,6 +1,6 @@
 from pico2d import load_image, get_time, delay
 from statemachine import StateMachine, space_down, time_out, right_down, left_down, right_up, left_up, start_event
-from statemachine import a_down, a_up
+from statemachine import a_down
 
 
 class Idle:
@@ -10,10 +10,10 @@ class Idle:
     def enter(boy, e):
         boy.start_time = get_time()     #현재 시작시간을
 
-        if left_up(e) or right_down(e):
+        if left_up(e) or right_down(e) or boy.dir == -1:
             boy.action = 2
             boy.face_dir = -1
-        elif right_up(e) or left_down(e) or start_event(e):
+        elif right_up(e) or left_down(e) or boy.dir == 1 or start_event(e):
             boy.action = 3
             boy.face_dir = 1
         #위에 얘들은 전부 입력이 있는 후에벌어지는 idle들임
@@ -30,7 +30,7 @@ class Idle:
         boy.frame = (boy.frame + 1) % 8       #소년객체의 프레임을 어찌저찌 진행해야하는거지
         #참고로 전달해준 boy는 파라미터일뿐이기에 boy라고하든 t라고하든 내맘대로바꾸든 상관없음!!!!
 
-        if get_time() - boy.start_time > 1:
+        if get_time() - boy.start_time > 100000000000000000000:
             #이벤트 발생
             boy.state_machine.add_event(('timeout', 0))
         pass
@@ -132,7 +132,8 @@ class Boy:
         self.state_machine.set_transitions(
             {
                 Idle: {right_down:Run, left_down:Run, left_up:Run, right_up:Run, time_out:Sleep,
-                       start_event: Idle, a_down:AutoRun},
+                       start_event: Idle,
+                       a_down:AutoRun},
                 AutoRun : {time_out:Idle,
                            right_down:Run, left_down:Run, left_up:Run, right_up:Run},
                 Run : {right_down: Idle, left_down: Idle, right_up: Idle, left_up:Idle},

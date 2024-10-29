@@ -97,5 +97,3 @@ def left_up(e):
 #AutoRun을 위한 함수
 def a_down(e):
     return e[0] == 'input' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
-def a_up(e):
-    return e[0] == 'input' and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
