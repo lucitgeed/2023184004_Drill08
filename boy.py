@@ -199,7 +199,7 @@ class AutoRun:
             boy.action = 0
 
 
-        if get_time() - boy.start_time > 3:
+        if get_time() - boy.start_time > 5:
             boy.state_machine.add_event(('timeout', 0))
             pass
 
