@@ -25,7 +25,6 @@ class Idle:
     @staticmethod
     def exit(boy, e):
         pass
-
     @staticmethod
     def do(boy):
         boy.frame = (boy.frame + 1) % 8       #소년객체의 프레임을 어찌저찌 진행해야하는거지
@@ -174,6 +173,9 @@ class AutoRun:
             boy.dir = -1
 
         boy.frame = 0
+
+        boy.start_time = get_time()
+
     @staticmethod
     def exit(boy, e):
         pass
@@ -194,6 +196,11 @@ class AutoRun:
             boy.action = 1
         elif boy.dir == -1:
             boy.action = 0
+
+
+        if get_time() - boy.start_time > 3:
+            boy.state_machine.add_event(('timeout', 0))
+            pass
 
     @staticmethod
     def draw(boy):
