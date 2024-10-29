@@ -30,7 +30,7 @@ class Idle:
         boy.frame = (boy.frame + 1) % 8       #소년객체의 프레임을 어찌저찌 진행해야하는거지
         #참고로 전달해준 boy는 파라미터일뿐이기에 boy라고하든 t라고하든 내맘대로바꾸든 상관없음!!!!
 
-        if get_time() - boy.start_time > 100000000000000000000:
+        if get_time() - boy.start_time > 5:
             #이벤트 발생
             boy.state_machine.add_event(('timeout', 0))
         pass
